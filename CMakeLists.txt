@@ -4,11 +4,12 @@ project(vulkan_test)
 
 
 add_compile_options("--std=c++20")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g ")
 find_library(libglfw glfw)
 find_library(libvulkan vulkan)
 include_directories("/opt/homebrew/opt/glm/include")
 include_directories("/opt/homebrew/opt/glfw/include/")
 include_directories("/usr/local/include/")
-add_executable(vulkan_test main.cpp)
+add_executable(vulkan_test main.cpp HelloTriangleApplication.cpp)
 
 target_link_libraries(vulkan_test ${libglfw} ${libvulkan})
