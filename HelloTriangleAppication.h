@@ -1,10 +1,14 @@
 
 #pragma once
 
+#define GLM_FORCE_RADIANS
 #define GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
 
+#include <chrono>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -51,15 +55,22 @@ class HelloTriangleApplication {
   void createSwapChain();
   void createImageViews();
   void createRenderPass();
+  void createDescriptorSetLayout();
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
   void createVertexBuffer();
+  void createIndexBuffer();
+  void createUniformBuffers();
+  void createDescriptorPool();
+  void createDescriptorSets();
   void createCommandBuffers();
   void createSyncObjects();
 
  private:
   void drawFrame();
+
+  void updateUniformBuffer(int currentImage);
 
  private:
   void recreateSwapChain();
@@ -101,6 +112,14 @@ class HelloTriangleApplication {
   uint32_t currentFrame = 0;
   VkBuffer vertexBuffer;
   VkDeviceMemory vertexBufferMemory;
+  VkBuffer indexBuffer;
+  VkDeviceMemory indexBufferMemory;
+
+  std::vector<VkBuffer> uniformBuffers;
+  std::vector<VkDeviceMemory> uniformBuffersMemory;
+  std::vector<void *> uniformBuffersMapped;
+  VkDescriptorPool descriptorPool;
+  std::vector<VkDescriptorSet> descriptorSets;
 
   std::vector<VkCommandBuffer> commandBuffers;
   std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -113,6 +132,7 @@ class HelloTriangleApplication {
   VkExtent2D swapChainExtent;
   VkRenderPass renderPass;
   VkPipeline graphicsPipeline;
+  VkDescriptorSetLayout descriptorSetLayout;
   VkPipelineLayout pipelineLayout;
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
