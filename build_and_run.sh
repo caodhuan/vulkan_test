@@ -1,3 +1,6 @@
 #!/bin/bash
 
-cmake . -BBuild && cd build && make &&  ./vulkan_test
+cmake . -BBuild 
+
+cp -r textures Build
+cd Build && make &&  ./vulkan_test

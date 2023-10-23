@@ -59,6 +59,9 @@ class HelloTriangleApplication {
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
+  void createTextureImage();
+  void createTextureImageView();
+  void createTextureSampler();
   void createVertexBuffer();
   void createIndexBuffer();
   void createUniformBuffers();
@@ -94,6 +97,16 @@ class HelloTriangleApplication {
   void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                     VkMemoryPropertyFlags properties, VkBuffer &buffer,
                     VkDeviceMemory &bufferMemory);
+  VkCommandBuffer beginSingleTimeCommands();
+  void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
+  void createImage(int width, int height, VkFormat format, VkImageTiling tiling,
+                   VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
+                   VkImage &image, VkDeviceMemory &imageMemory);
+  void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
+                         uint32_t height);
+  void transitionImageLayout(VkImage image, VkFormat format,
+                             VkImageLayout oldLayout, VkImageLayout newLayout);
 
  private:
   bool checkValidationLayerSupport();
@@ -108,6 +121,12 @@ class HelloTriangleApplication {
 
   VkCommandPool commandPool;
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+  VkImageView textureImageView;
+  VkSampler textureSampler;
+
+  VkImage textureImage;
+  VkDeviceMemory textureImageMemory;
 
   uint32_t currentFrame = 0;
   VkBuffer vertexBuffer;
