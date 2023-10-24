@@ -2,6 +2,7 @@
 #pragma once
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
@@ -59,6 +60,7 @@ class HelloTriangleApplication {
   void createGraphicsPipeline();
   void createFramebuffers();
   void createCommandPool();
+  void createDepthResources();
   void createTextureImage();
   void createTextureImageView();
   void createTextureSampler();
@@ -108,6 +110,17 @@ class HelloTriangleApplication {
   void transitionImageLayout(VkImage image, VkFormat format,
                              VkImageLayout oldLayout, VkImageLayout newLayout);
 
+  VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates,
+                               VkImageTiling tiling,
+                               VkFormatFeatureFlags features);
+
+  VkFormat findDepthFormat();
+
+  bool hasStencilComponent(VkFormat format);
+
+  VkImageView createImageView(VkImage image, VkFormat format,
+                              VkImageAspectFlags aspectFlags);
+
  private:
   bool checkValidationLayerSupport();
 
@@ -124,6 +137,10 @@ class HelloTriangleApplication {
 
   VkImageView textureImageView;
   VkSampler textureSampler;
+
+  VkImage depthImage;
+  VkDeviceMemory depthImageMemory;
+  VkImageView depthImageView;
 
   VkImage textureImage;
   VkDeviceMemory textureImageMemory;

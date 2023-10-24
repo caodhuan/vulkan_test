@@ -4,7 +4,7 @@ project(vulkan_test)
 
 
 add_compile_options("--std=c++20")
-SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g ")
+set(CMAKE_CXX_FLAGS   "-g")                     # 调试信息
 find_library(libglfw glfw)
 find_library(libvulkan vulkan)
 include_directories("/opt/homebrew/opt/glm/include")
