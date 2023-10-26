@@ -6,16 +6,27 @@
 
 #include <GLFW/glfw3.h>
 
+#include <algorithm>  // Necessary for std::clamp
+#include <cstdint>    // Necessary for uint32_t
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <limits>  // Necessary for std::numeric_limits
 #include <optional>
 #include <string>
 #include <vector>
-
 struct QueueFamilyIndices {
   std::optional<unsigned> graphicsFamily;
+  std::optional<uint32_t> presentFamily;
 
-  bool isComplete() { return graphicsFamily.has_value(); }
+  bool isComplete() {
+    return graphicsFamily.has_value() && presentFamily.has_value();
+  }
+};
+
+struct SwapChainSupportDetails {
+  VkSurfaceCapabilitiesKHR capabilities;
+  std::vector<VkSurfaceFormatKHR> formats;
+  std::vector<VkPresentModeKHR> presentModes;
 };
 
 // 对 vulkan 使用的封装
@@ -38,6 +49,12 @@ class ApplicationBase {
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
+  // check the device swap chain support
+  SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+  VkPresentModeKHR chooseSwapPresentMode(
+      const std::vector<VkPresentModeKHR> &availablePresentModes);
+
  private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
                                         int height);
@@ -55,10 +72,13 @@ class ApplicationBase {
 #else
   const bool enableValidationLayers = true;
 #endif
+  const std::vector<const char *> deviceExtensions = {
+      VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset"};
 
   VkInstance instance;
+  VkSurfaceKHR surface;             // represent the windows
   VkPhysicalDevice physicalDevice;  // represent one physical graphics card
   VkDevice device;                  // represent a logical device
   VkQueue graphicsQueue;            // represent a command queue
-  VkSurfaceKHR surface;             // represent the windows
+  VkQueue presentQueue;
 };

@@ -1,6 +1,5 @@
 
 
-#include <cstdlib>
 #include <iostream>
 
 #include "ApplicationBase.h"

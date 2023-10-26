@@ -10,6 +10,6 @@ find_library(libvulkan vulkan)
 include_directories("/opt/homebrew/opt/glm/include")
 include_directories("/opt/homebrew/opt/glfw/include/")
 include_directories("/usr/local/include/")
-add_executable(vulkan_test main.cpp HelloTriangleApplication.cpp ApplicationBase.cpp)
+add_executable(vulkan_test main.cpp  ApplicationBase.cpp)
 
 target_link_libraries(vulkan_test ${libglfw} ${libvulkan})
