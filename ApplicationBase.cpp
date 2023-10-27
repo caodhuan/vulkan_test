@@ -13,7 +13,8 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
       physicalDevice(nullptr),
       device(nullptr),
       graphicsQueue(nullptr),
-      presentQueue(nullptr) {
+      presentQueue(nullptr),
+      swapChain(nullptr) {
   glfwInit();
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
@@ -22,6 +23,16 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
 }
 
 ApplicationBase::~ApplicationBase() {
+  for (auto imageView : swapChainImageViews) {
+    vkDestroyImageView(device, imageView, nullptr);
+  }
+  swapChainImageViews.clear();
+
+  if (swapChain) {
+    vkDestroySwapchainKHR(device, swapChain, nullptr);
+    swapChain = nullptr;
+  }
+
   if (device) {
     vkDestroyDevice(device, nullptr);
     device = nullptr;
@@ -100,6 +111,13 @@ bool ApplicationBase::InitApplication() {
   }
 
   if (!createLogicalDevice()) {
+    return false;
+  }
+
+  if (!createSwapChain()) {
+    return false;
+  }
+  if (!createImageViews()) {
     return false;
   }
 }
@@ -218,9 +236,6 @@ SwapChainSupportDetails ApplicationBase::querySwapChainSupport(
   return details;
 }
 
-VkPresentModeKHR chooseSwapPresentMode(
-    const std::vector<VkPresentModeKHR> &availablePresentModes) {}
-
 bool ApplicationBase::createLogicalDevice() {
   QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
@@ -250,5 +265,128 @@ bool ApplicationBase::createLogicalDevice() {
   // init graphics queue
   vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
   vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+  return true;
+}
+
+bool ApplicationBase::createSwapChain() {
+  SwapChainSupportDetails swapChainSupport =
+      querySwapChainSupport(physicalDevice);
+  VkSurfaceFormatKHR surfaceFormat;
+  bool hasValue = false;
+  for (const auto &availableFormat : swapChainSupport.formats) {
+    if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
+        availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+      surfaceFormat = availableFormat;
+      hasValue = false;
+      break;
+    }
+  }
+  if (!hasValue) {
+    surfaceFormat = swapChainSupport.formats[0];
+  }
+
+  hasValue = false;
+  VkPresentModeKHR presentMode;
+  for (const auto &availablePresentMode : swapChainSupport.presentModes) {
+    if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+      presentMode = availablePresentMode;
+      hasValue = true;
+      break;
+    }
+  }
+  if (!hasValue) {
+    presentMode = VK_PRESENT_MODE_FIFO_KHR;
+  }
+
+  VkExtent2D extent;
+  if (swapChainSupport.capabilities.currentExtent.width !=
+      std::numeric_limits<uint32_t>::max()) {
+    std::cout << "capabilities width = "
+              << swapChainSupport.capabilities.currentExtent.width
+              << "\theight = "
+              << swapChainSupport.capabilities.currentExtent.height
+              << std::endl;
+    extent = swapChainSupport.capabilities.currentExtent;
+  } else {
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    cout << "frame buffer size width = " << width << "\theight = " << height
+         << endl;
+
+    extent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
+
+    extent.width = std::clamp(
+        extent.width, swapChainSupport.capabilities.minImageExtent.width,
+        swapChainSupport.capabilities.maxImageExtent.width);
+    extent.height = std::clamp(
+        extent.height, swapChainSupport.capabilities.minImageExtent.height,
+        swapChainSupport.capabilities.maxImageExtent.height);
+  }
+  uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+  if (swapChainSupport.capabilities.maxImageCount > 0 &&
+      imageCount > swapChainSupport.capabilities.maxImageCount) {
+    imageCount = swapChainSupport.capabilities.maxImageCount;
+  }
+  cout << "swap chain min image count = "
+       << swapChainSupport.capabilities.minImageCount << endl;
+  cout << "swap chain max image count = "
+       << swapChainSupport.capabilities.maxImageCount << endl;
+
+  VkSwapchainCreateInfoKHR createInfo{};
+  createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  createInfo.surface = surface;
+  createInfo.minImageCount = imageCount;
+  createInfo.imageFormat = surfaceFormat.format;
+  createInfo.imageColorSpace = surfaceFormat.colorSpace;
+  createInfo.imageExtent = extent;
+  createInfo.imageArrayLayers =
+      1;  // this is where i can set up more than 1 image
+  createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+  createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  createInfo.presentMode = presentMode;
+  createInfo.clipped = VK_TRUE;
+  createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+  if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) !=
+      VK_SUCCESS) {
+    return false;
+  }
+  swapChainImageFormat = swapChainImageFormat;
+  swapChainExtent = extent;
+
+  vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
+  swapChainImages.resize(imageCount);
+  cout << "swap chain image cout = " << imageCount << endl;
+  vkGetSwapchainImagesKHR(device, swapChain, &imageCount,
+                          swapChainImages.data());
+
+  return true;
+}
+
+bool ApplicationBase::createImageViews() {
+  swapChainImageViews.resize(swapChainImages.size());
+  for (size_t i = 0; i < swapChainImages.size(); i++) {
+    VkImageViewCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    createInfo.image = swapChainImages[i];
+    createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    createInfo.format = swapChainImageFormat;
+    createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+    createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    createInfo.subresourceRange.baseMipLevel = 0;
+    createInfo.subresourceRange.levelCount = 1;
+    createInfo.subresourceRange.baseArrayLayer = 0;
+    createInfo.subresourceRange.layerCount = 1;
+    if (vkCreateImageView(device, &createInfo, nullptr,
+                          &swapChainImageViews[i]) != VK_SUCCESS) {
+      return false;
+    }
+  }
+
   return true;
 }

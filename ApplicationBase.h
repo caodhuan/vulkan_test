@@ -47,13 +47,15 @@ class ApplicationBase {
   // init logical device
   bool createLogicalDevice();
 
+  // init swap chain
+  bool createSwapChain();
+
+    // init image view
+  bool createImageViews();
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
   // check the device swap chain support
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-  VkPresentModeKHR chooseSwapPresentMode(
-      const std::vector<VkPresentModeKHR> &availablePresentModes);
 
  private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
@@ -81,4 +83,9 @@ class ApplicationBase {
   VkDevice device;                  // represent a logical device
   VkQueue graphicsQueue;            // represent a command queue
   VkQueue presentQueue;
+  VkSwapchainKHR swapChain;  //
+  VkFormat swapChainImageFormat;
+  VkExtent2D swapChainExtent;
+  std::vector<VkImage> swapChainImages;
+  std::vector<VkImageView> swapChainImageViews;
 };
