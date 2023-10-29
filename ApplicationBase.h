@@ -52,6 +52,9 @@ class ApplicationBase {
 
     // init image view
   bool createImageViews();
+    // init graphics pipline
+  bool createGraphicsPipeline();
+
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
   // check the device swap chain support

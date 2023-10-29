@@ -120,6 +120,11 @@ bool ApplicationBase::InitApplication() {
   if (!createImageViews()) {
     return false;
   }
+  if (!createGraphicsPipeline()) {
+    return false;
+  }
+
+  return true;
 }
 
 bool ApplicationBase::checkValidationLayerSupport() {
@@ -353,7 +358,7 @@ bool ApplicationBase::createSwapChain() {
       VK_SUCCESS) {
     return false;
   }
-  swapChainImageFormat = swapChainImageFormat;
+  swapChainImageFormat = surfaceFormat.format;
   swapChainExtent = extent;
 
   vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
@@ -390,3 +395,4 @@ bool ApplicationBase::createImageViews() {
 
   return true;
 }
+bool ApplicationBase::createGraphicsPipeline() {}
