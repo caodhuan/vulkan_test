@@ -36,7 +36,11 @@ class ApplicationBase {
   virtual ~ApplicationBase();
 
  public:
-  bool InitApplication();
+  static std::vector<char> readFile(const std::string &filename);
+
+ public:
+  bool InitApplication(const std::string &vertShaderPath,
+                       const std::string &fragShaderPath);
 
  private:
   bool checkValidationLayerSupport();
@@ -50,10 +54,19 @@ class ApplicationBase {
   // init swap chain
   bool createSwapChain();
 
-    // init image view
+  // init image view
   bool createImageViews();
-    // init graphics pipline
-  bool createGraphicsPipeline();
+
+  // create one render pass
+  bool createRenderPass();
+
+  // init graphics pipline
+  bool createGraphicsPipeline(const std::string &vertShaderPath,
+                              const std::string &fragShaderPath);
+  // create frame buffer for earch image view
+  bool createFramebuffers();
+
+  VkShaderModule createShaderModule(const std::vector<char> &code);
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
@@ -91,4 +104,8 @@ class ApplicationBase {
   VkExtent2D swapChainExtent;
   std::vector<VkImage> swapChainImages;
   std::vector<VkImageView> swapChainImageViews;
+  VkRenderPass renderPass;
+  VkPipelineLayout pipelineLayout;  // pipeline layout creation
+  VkPipeline graphicsPipeline;
+  std::vector<VkFramebuffer> swapChainFramebuffers;
 };
