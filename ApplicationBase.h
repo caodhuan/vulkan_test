@@ -65,7 +65,8 @@ class ApplicationBase {
                               const std::string &fragShaderPath);
   // create frame buffer for earch image view
   bool createFramebuffers();
-
+  // init command pool
+  bool createCommadPool();
   VkShaderModule createShaderModule(const std::vector<char> &code);
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
@@ -108,4 +109,6 @@ class ApplicationBase {
   VkPipelineLayout pipelineLayout;  // pipeline layout creation
   VkPipeline graphicsPipeline;
   std::vector<VkFramebuffer> swapChainFramebuffers;
+
+  VkCommandPool commandPool;
 };

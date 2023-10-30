@@ -18,7 +18,8 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
       swapChain(nullptr),
       pipelineLayout(nullptr),
       renderPass(nullptr),
-      graphicsPipeline(nullptr) {
+      graphicsPipeline(nullptr),
+      commandPool(nullptr) {
   glfwInit();
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
@@ -27,6 +28,10 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
 }
 
 ApplicationBase::~ApplicationBase() {
+  if (commandPool) {
+    vkDestroyCommandPool(device, commandPool, nullptr);
+    commandPool = nullptr;
+  }
   for (auto framebuffer : swapChainFramebuffers) {
     vkDestroyFramebuffer(device, framebuffer, nullptr);
   }
@@ -175,6 +180,10 @@ bool ApplicationBase::InitApplication(const std::string &vertShaderPath,
   }
 
   if (!createFramebuffers()) {
+    return false;
+  }
+
+  if (!createCommadPool()) {
     return false;
   }
 
@@ -618,7 +627,31 @@ bool ApplicationBase::createGraphicsPipeline(
   return true;
 }
 
-bool ApplicationBase::createFramebuffers() { return true; }
+bool ApplicationBase::createFramebuffers() {
+  swapChainFramebuffers.resize(swapChainImageViews.size());
+
+  for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+    VkImageView attachments[] = {swapChainImageViews[i]};
+
+    VkFramebufferCreateInfo framebufferInfo{};
+    framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebufferInfo.renderPass = renderPass;
+    framebufferInfo.attachmentCount = 1;
+    framebufferInfo.pAttachments = attachments;
+    framebufferInfo.width = swapChainExtent.width;
+    framebufferInfo.height = swapChainExtent.height;
+    framebufferInfo.layers = 1;
+
+    if (vkCreateFramebuffer(device, &framebufferInfo, nullptr,
+                            &swapChainFramebuffers[i]) != VK_SUCCESS) {
+      cout << "create framebuffer failed" << endl;
+
+      return false;
+    }
+  }
+
+  return true;
+}
 
 VkShaderModule ApplicationBase::createShaderModule(
     const std::vector<char> &code) {
@@ -633,4 +666,20 @@ VkShaderModule ApplicationBase::createShaderModule(
   }
 
   return shaderModule;
+}
+
+bool ApplicationBase::createCommadPool() {
+  QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+  VkCommandPoolCreateInfo poolInfo{};
+  poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+  poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
+  if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) !=
+      VK_SUCCESS) {
+    cout << "create command pool failed" << endl;
+
+    return false;
+  }
+
+  return true;
 }
