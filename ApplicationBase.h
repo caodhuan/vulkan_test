@@ -41,6 +41,7 @@ class ApplicationBase {
  public:
   bool InitApplication(const std::string &vertShaderPath,
                        const std::string &fragShaderPath);
+  void Run();
 
  private:
   bool checkValidationLayerSupport();
@@ -67,12 +68,22 @@ class ApplicationBase {
   bool createFramebuffers();
   // init command pool
   bool createCommadPool();
+  // init a command buffer
+  bool createCommandBuffer();
+
+  bool createSyncObjects();
+
   VkShaderModule createShaderModule(const std::vector<char> &code);
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
   // check the device swap chain support
   SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+  void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+  // draw
+  void drawFrame();
 
  private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
@@ -111,4 +122,10 @@ class ApplicationBase {
   std::vector<VkFramebuffer> swapChainFramebuffers;
 
   VkCommandPool commandPool;
+  VkCommandBuffer commandBuffer;
+
+  // synchronization
+  VkSemaphore imageAvailableSemaphore;
+  VkSemaphore renderFinishedSemaphore;
+  VkFence inFlightFence;
 };
