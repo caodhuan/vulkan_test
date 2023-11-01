@@ -85,6 +85,9 @@ class ApplicationBase {
   // draw
   void drawFrame();
 
+    // swap chain
+  void recreateSwapChain();
+
  private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
                                         int height);

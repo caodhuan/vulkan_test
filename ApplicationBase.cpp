@@ -857,3 +857,11 @@ void ApplicationBase::drawFrame() {
   presentInfo.pResults = nullptr;  // Optional
   vkQueuePresentKHR(presentQueue, &presentInfo);
 }
+
+void ApplicationBase::recreateSwapChain() {
+    vkDeviceWaitIdle(device);
+
+    createSwapChain();
+    createImageViews();
+    createFramebuffers();
+}
