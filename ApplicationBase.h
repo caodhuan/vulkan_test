@@ -88,7 +88,9 @@ class ApplicationBase {
     // swap chain
   void recreateSwapChain();
 
- private:
+  void cleanupSwapChain();
+
+private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
                                         int height);
 

@@ -32,14 +32,12 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
 }
 
 ApplicationBase::~ApplicationBase() {
+  cleanupSwapChain();
+
   if (commandPool) {
     vkDestroyCommandPool(device, commandPool, nullptr);
     commandPool = nullptr;
   }
-  for (auto framebuffer : swapChainFramebuffers) {
-    vkDestroyFramebuffer(device, framebuffer, nullptr);
-  }
-  swapChainFramebuffers.clear();
 
   if (graphicsPipeline) {
     vkDestroyPipeline(device, graphicsPipeline, nullptr);
@@ -54,17 +52,6 @@ ApplicationBase::~ApplicationBase() {
   if (pipelineLayout) {
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
     pipelineLayout = nullptr;
-  }
-
-  for (auto imageView : swapChainImageViews) {
-    vkDestroyImageView(device, imageView, nullptr);
-  }
-
-  swapChainImageViews.clear();
-
-  if (swapChain) {
-    vkDestroySwapchainKHR(device, swapChain, nullptr);
-    swapChain = nullptr;
   }
 
   if (imageAvailableSemaphore) {
@@ -816,11 +803,23 @@ bool ApplicationBase::createSyncObjects() {
 
 void ApplicationBase::drawFrame() {
   vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-  vkResetFences(device, 1, &inFlightFence);
 
   uint32_t imageIndex;
-  vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore,
-                        VK_NULL_HANDLE, &imageIndex);
+  VkResult acquireResult = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX,
+                                                 imageAvailableSemaphore,
+                                                 VK_NULL_HANDLE, &imageIndex);
+
+  if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR) {
+    cout << "out of date" << endl;
+    recreateSwapChain();
+    return;
+  } else if (acquireResult != VK_SUCCESS &&
+             acquireResult != VK_SUBOPTIMAL_KHR) {
+    cout << "failed acquire swap chain image" << endl;
+    return;
+  }
+
+  vkResetFences(device, 1, &inFlightFence);
 
   vkResetCommandBuffer(commandBuffer, 0);
   recordCommandBuffer(commandBuffer, imageIndex);
@@ -855,13 +854,42 @@ void ApplicationBase::drawFrame() {
   presentInfo.pSwapchains = swapChains;
   presentInfo.pImageIndices = &imageIndex;
   presentInfo.pResults = nullptr;  // Optional
-  vkQueuePresentKHR(presentQueue, &presentInfo);
+  VkResult queuePresentResut = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+  if (queuePresentResut == VK_ERROR_OUT_OF_DATE_KHR ||
+      queuePresentResut == VK_SUBOPTIMAL_KHR || framebufferResized) {
+    cout << "present out of date" << endl;
+    recreateSwapChain();
+  } else if (queuePresentResut != VK_SUCCESS) {
+    cout << ("failed to present swap chain image!") << endl;
+  }
 }
 
 void ApplicationBase::recreateSwapChain() {
-    vkDeviceWaitIdle(device);
+  int width = 0, height = 0;
+  glfwGetFramebufferSize(window, &width, &height);
+  while (width == 0 || height == 0) {
+    glfwGetFramebufferSize(window, &width, &height);
+    glfwWaitEvents();
+  }
 
-    createSwapChain();
-    createImageViews();
-    createFramebuffers();
+  vkDeviceWaitIdle(device);
+
+  cleanupSwapChain();
+
+  createSwapChain();
+  createImageViews();
+  createFramebuffers();
+}
+
+void ApplicationBase::cleanupSwapChain() {
+  for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
+    vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
+  }
+
+  for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+    vkDestroyImageView(device, swapChainImageViews[i], nullptr);
+  }
+
+  vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
