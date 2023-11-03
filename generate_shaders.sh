@@ -14,3 +14,6 @@ glslc shader.frag -o ../Build/shaders/frag.spv
 
 glslc first_triangle.vert -o ../Build/shaders/first_triangle.vert.spv
 glslc first_triangle.frag -o ../Build/shaders/first_triangle.frag.spv
+
+glslc colored_triangle.vert -o ../Build/shaders/colored_triangle.vert.spv
+glslc colored_triangle.frag -o ../Build/shaders/colored_triangle.frag.spv
