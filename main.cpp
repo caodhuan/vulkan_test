@@ -6,10 +6,11 @@
 // #include "HelloTriangleAppication.h"
 int main() {
   // HelloTriangleApplication app;
-  ApplicationBase base{"base test", 800, 800};
+  ApplicationBase base;
   try {
     if (base.InitApplication("shaders/colored_triangle.vert.spv",
-                             "shaders/colored_triangle.frag.spv")) {
+                             "shaders/colored_triangle.frag.spv", "base test",
+                             600, 800)) {
       base.Run();
     }
 

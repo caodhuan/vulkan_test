@@ -5,10 +5,9 @@
 
 using namespace std;
 
-ApplicationBase::ApplicationBase(const std::string &title, int width,
-                                 int height)
-    : width(width),
-      height(height),
+ApplicationBase::ApplicationBase()
+    : width(0),
+      height(0),
       framebufferResized(false),
       instance(nullptr),
       physicalDevice(nullptr),
@@ -23,13 +22,7 @@ ApplicationBase::ApplicationBase(const std::string &title, int width,
       commandBuffer(nullptr),
       imageAvailableSemaphore(nullptr),
       renderFinishedSemaphore(nullptr),
-      inFlightFence(nullptr) {
-  glfwInit();
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-  glfwSetWindowUserPointer(window, this);
-  glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-}
+      inFlightFence(nullptr) {}
 
 ApplicationBase::~ApplicationBase() {
   cleanupSwapChain();
@@ -113,7 +106,17 @@ void ApplicationBase::framebufferResizeCallback(GLFWwindow *window, int width,
 }
 
 bool ApplicationBase::InitApplication(const std::string &vertShaderPath,
-                                      const std::string &fragShaderPath) {
+                                      const std::string &fragShaderPath,
+                                      const std::string &title, int width,
+                                      int height) {
+  this->width = width;
+  this->height = height;
+  glfwInit();
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+  window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+  glfwSetWindowUserPointer(window, this);
+  glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+
   if (enableValidationLayers && !checkValidationLayerSupport()) {
     return false;
   }

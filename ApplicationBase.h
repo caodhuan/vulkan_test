@@ -32,7 +32,7 @@ struct SwapChainSupportDetails {
 // 对 vulkan 使用的封装
 class ApplicationBase {
  public:
-  ApplicationBase(const std::string &title, int width = 600, int height = 800);
+  ApplicationBase();
   virtual ~ApplicationBase();
 
  public:
@@ -40,7 +40,9 @@ class ApplicationBase {
 
  public:
   bool InitApplication(const std::string &vertShaderPath,
-                       const std::string &fragShaderPath);
+                       const std::string &fragShaderPath,
+                       const std::string &title, int width = 600,
+                       int height = 800);
   void Run();
 
  private:
@@ -85,12 +87,12 @@ class ApplicationBase {
   // draw
   void drawFrame();
 
-    // swap chain
+  // swap chain
   void recreateSwapChain();
 
   void cleanupSwapChain();
 
-private:
+ private:
   static void framebufferResizeCallback(GLFWwindow *window, int width,
                                         int height);
 
