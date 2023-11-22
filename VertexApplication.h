@@ -4,9 +4,9 @@
 #include "ApplicationBase.h"
 
 class VertexApplication : public ApplicationBase {
- public:
-  VertexApplication();
-  ~VertexApplication();
+public:
+    VertexApplication();
+    ~VertexApplication();
 
- public:
+public:
 };
