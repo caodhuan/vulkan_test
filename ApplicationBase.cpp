@@ -76,7 +76,7 @@ std::vector<char> ApplicationBase::readFile(const std::string &filename) {
         throw std::runtime_error("failed to open file!");
     }
 
-    size_t fileSize = (size_t)file.tellg();
+    size_t            fileSize = (size_t)file.tellg();
     std::vector<char> buffer(fileSize);
 
     file.seekg(0);
@@ -110,7 +110,7 @@ bool ApplicationBase::InitApplication(const std::string &vertShaderPath,
         return false;
     }
 
-    uint32_t glfwExtensionCount = 0;
+    uint32_t     glfwExtensionCount = 0;
     const char **glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
@@ -360,7 +360,7 @@ bool ApplicationBase::createSwapChain() {
     SwapChainSupportDetails swapChainSupport =
         querySwapChainSupport(physicalDevice);
     VkSurfaceFormatKHR surfaceFormat;
-    bool hasValue = false;
+    bool               hasValue = false;
     for (const auto &availableFormat : swapChainSupport.formats) {
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -548,7 +548,7 @@ bool ApplicationBase::createGraphicsPipeline(
         cout << "destroy frag shader" << endl;
         vkDestroyShaderModule(device, p, nullptr);
     });
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+    VkPipelineShaderStageCreateInfo   vertShaderStageInfo{};
     vertShaderStageInfo.sType =
         VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -614,8 +614,8 @@ bool ApplicationBase::createGraphicsPipeline(
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    std::vector<VkDynamicState> dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT,
-                                                 VK_DYNAMIC_STATE_SCISSOR};
+    std::vector<VkDynamicState>      dynamicStates = {VK_DYNAMIC_STATE_VIEWPORT,
+                                                      VK_DYNAMIC_STATE_SCISSOR};
     VkPipelineDynamicStateCreateInfo dynamicState{};
     dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamicState.dynamicStateCount =
@@ -701,7 +701,7 @@ ApplicationBase::createShaderModule(const std::vector<char> &code) {
 }
 
 bool ApplicationBase::createCommadPool() {
-    QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+    QueueFamilyIndices      indices = findQueueFamilies(physicalDevice);
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -733,7 +733,7 @@ bool ApplicationBase::createCommandBuffer() {
 }
 
 void ApplicationBase::recordCommandBuffer(VkCommandBuffer commandBuffer,
-                                          uint32_t imageIndex) {
+                                          uint32_t        imageIndex) {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0;
@@ -826,7 +826,7 @@ void ApplicationBase::drawFrame() {
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+    VkSemaphore          waitSemaphores[] = {imageAvailableSemaphore};
     VkPipelineStageFlags waitStages[] = {
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
@@ -893,7 +893,7 @@ void ApplicationBase::cleanupSwapChain() {
     vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
-uint32_t ApplicationBase::findMemoryType(uint32_t typeFilter,
+uint32_t ApplicationBase::findMemoryType(uint32_t              typeFilter,
                                          VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memProperties;
     vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -911,8 +911,8 @@ uint32_t ApplicationBase::findMemoryType(uint32_t typeFilter,
 
 void ApplicationBase::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                                    VkMemoryPropertyFlags properties,
-                                   VkBuffer &buffer,
-                                   VkDeviceMemory &bufferMemory) {
+                                   VkBuffer             &buffer,
+                                   VkDeviceMemory       &bufferMemory) {
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = size;

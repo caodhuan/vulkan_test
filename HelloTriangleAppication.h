@@ -24,9 +24,9 @@ struct QueueFamilyIndices {
 };
 
 struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
+    VkSurfaceCapabilitiesKHR        capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
+    std::vector<VkPresentModeKHR>   presentModes;
 };
 
 struct Vertex {
@@ -120,11 +120,11 @@ private:
     void cleanupSwapChain();
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     void recordCommandBuffer(VkCommandBuffer commandBuffer,
-                             uint32_t imageIndex);
+                             uint32_t        imageIndex);
     VkShaderModule createShaderModule(const std::vector<char> &code);
 
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+    bool               isDeviceSuitable(VkPhysicalDevice device);
+    bool               checkDeviceExtensionSupport(VkPhysicalDevice device);
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
@@ -133,13 +133,13 @@ private:
         const std::vector<VkSurfaceFormatKHR> &availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(
         const std::vector<VkPresentModeKHR> &availablePresentModes);
-    uint32_t findMemoryType(uint32_t typeFilter,
-                            VkMemoryPropertyFlags properties);
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                      VkMemoryPropertyFlags properties, VkBuffer &buffer,
-                      VkDeviceMemory &bufferMemory);
+    uint32_t        findMemoryType(uint32_t              typeFilter,
+                                   VkMemoryPropertyFlags properties);
+    void            createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                                 VkMemoryPropertyFlags properties, VkBuffer &buffer,
+                                 VkDeviceMemory &bufferMemory);
     VkCommandBuffer beginSingleTimeCommands();
-    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+    void            endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
     void createImage(int width, int height, VkFormat format,
                      VkImageTiling tiling, VkImageUsageFlags usage,
@@ -152,8 +152,8 @@ private:
                                VkImageLayout newLayout);
 
     VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates,
-                                 VkImageTiling tiling,
-                                 VkFormatFeatureFlags features);
+                                 VkImageTiling                tiling,
+                                 VkFormatFeatureFlags         features);
 
     VkFormat findDepthFormat();
 
@@ -166,60 +166,60 @@ private:
     bool checkValidationLayerSupport();
 
 private:
-    const int WIDTH{800};
-    const int HEIGHT{600};
+    const int         WIDTH{800};
+    const int         HEIGHT{600};
     const std::string MODEL_PATH = "models/viking_room.obj";
     const std::string TEXTURE_PATH = "textures/viking_room.png";
 
-    bool framebufferResized = false;
+    bool        framebufferResized = false;
     GLFWwindow *window;
 
     VkInstance instance;
 
-    VkCommandPool commandPool;
+    VkCommandPool    commandPool;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
     VkImageView textureImageView;
-    VkSampler textureSampler;
+    VkSampler   textureSampler;
 
-    VkImage depthImage;
+    VkImage        depthImage;
     VkDeviceMemory depthImageMemory;
-    VkImageView depthImageView;
+    VkImageView    depthImageView;
 
-    VkImage textureImage;
+    VkImage        textureImage;
     VkDeviceMemory textureImageMemory;
 
-    uint32_t currentFrame = 0;
-    std::vector<Vertex> vertices;
+    uint32_t              currentFrame = 0;
+    std::vector<Vertex>   vertices;
     std::vector<uint32_t> indices;
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
+    VkBuffer              vertexBuffer;
+    VkDeviceMemory        vertexBufferMemory;
+    VkBuffer              indexBuffer;
+    VkDeviceMemory        indexBufferMemory;
 
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-    std::vector<void *> uniformBuffersMapped;
-    VkDescriptorPool descriptorPool;
+    std::vector<VkBuffer>        uniformBuffers;
+    std::vector<VkDeviceMemory>  uniformBuffersMemory;
+    std::vector<void *>          uniformBuffersMapped;
+    VkDescriptorPool             descriptorPool;
     std::vector<VkDescriptorSet> descriptorSets;
 
     std::vector<VkCommandBuffer> commandBuffers;
-    std::vector<VkSemaphore> imageAvailableSemaphores;
-    std::vector<VkSemaphore> renderFinishedSemaphores;
-    std::vector<VkFence> inFlightFences;
+    std::vector<VkSemaphore>     imageAvailableSemaphores;
+    std::vector<VkSemaphore>     renderFinishedSemaphores;
+    std::vector<VkFence>         inFlightFences;
 
     VkSwapchainKHR swapChain;
 
-    VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
-    VkRenderPass renderPass;
-    VkPipeline graphicsPipeline;
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkPipelineLayout pipelineLayout;
-    std::vector<VkImage> swapChainImages;
-    std::vector<VkImageView> swapChainImageViews;
+    VkFormat                   swapChainImageFormat;
+    VkExtent2D                 swapChainExtent;
+    VkRenderPass               renderPass;
+    VkPipeline                 graphicsPipeline;
+    VkDescriptorSetLayout      descriptorSetLayout;
+    VkPipelineLayout           pipelineLayout;
+    std::vector<VkImage>       swapChainImages;
+    std::vector<VkImageView>   swapChainImageViews;
     std::vector<VkFramebuffer> swapChainFramebuffers;
-    VkDevice device;
+    VkDevice                   device;
 
     VkQueue graphicsQueue;
 

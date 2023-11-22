@@ -24,9 +24,9 @@ struct QueueFamilyIndices {
 };
 
 struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
+    VkSurfaceCapabilitiesKHR        capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
+    std::vector<VkPresentModeKHR>   presentModes;
 };
 
 // 对 vulkan 使用的封装
@@ -83,7 +83,7 @@ private:
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
     void recordCommandBuffer(VkCommandBuffer commandBuffer,
-                             uint32_t imageIndex);
+                             uint32_t        imageIndex);
 
     // draw
     void drawFrame();
@@ -93,7 +93,7 @@ private:
 
     void cleanupSwapChain();
 
-    uint32_t findMemoryType(uint32_t typeFilter,
+    uint32_t findMemoryType(uint32_t              typeFilter,
                             VkMemoryPropertyFlags properties);
 
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
@@ -106,9 +106,9 @@ private:
                                           int height);
 
 private:
-    int width, height;
+    int         width, height;
     GLFWwindow *window;
-    bool framebufferResized;
+    bool        framebufferResized;
 
     const std::vector<const char *> validationLayers = {
         "VK_LAYER_KHRONOS_validation"};
@@ -121,27 +121,27 @@ private:
     const std::vector<const char *> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset"};
 
-    VkInstance instance;
-    VkSurfaceKHR surface;            // represent the windows
-    VkPhysicalDevice physicalDevice; // represent one physical graphics card
-    VkDevice device;                 // represent a logical device
-    VkQueue graphicsQueue;           // represent a command queue
-    VkQueue presentQueue;
-    VkSwapchainKHR swapChain; //
-    VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
+    VkInstance           instance;
+    VkSurfaceKHR         surface;        // represent the windows
+    VkPhysicalDevice     physicalDevice; // represent one physical graphics card
+    VkDevice             device;         // represent a logical device
+    VkQueue              graphicsQueue;  // represent a command queue
+    VkQueue              presentQueue;
+    VkSwapchainKHR       swapChain; //
+    VkFormat             swapChainImageFormat;
+    VkExtent2D           swapChainExtent;
     std::vector<VkImage> swapChainImages;
-    std::vector<VkImageView> swapChainImageViews;
-    VkRenderPass renderPass;
-    VkPipelineLayout pipelineLayout; // pipeline layout creation
-    VkPipeline graphicsPipeline;
+    std::vector<VkImageView>   swapChainImageViews;
+    VkRenderPass               renderPass;
+    VkPipelineLayout           pipelineLayout; // pipeline layout creation
+    VkPipeline                 graphicsPipeline;
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
-    VkCommandPool commandPool;
+    VkCommandPool   commandPool;
     VkCommandBuffer commandBuffer;
 
     // synchronization
     VkSemaphore imageAvailableSemaphore;
     VkSemaphore renderFinishedSemaphore;
-    VkFence inFlightFence;
+    VkFence     inFlightFence;
 };
