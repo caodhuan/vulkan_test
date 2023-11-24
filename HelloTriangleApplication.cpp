@@ -1537,6 +1537,7 @@ void HelloTriangleApplication::transitionImageLayout(VkImage       image,
     barrier.dstAccessMask = 0; // TODO
     
     VkPipelineStageFlags sourceStage;
+    
     VkPipelineStageFlags destinationStage;
 
     if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
