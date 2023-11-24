@@ -1520,6 +1520,7 @@ void HelloTriangleApplication::transitionImageLayout(VkImage       image,
                                                      VkImageLayout oldLayout,
                                                      VkImageLayout newLayout) {
     VkCommandBuffer      commandBuffer = beginSingleTimeCommands();
+
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = oldLayout;
@@ -1534,6 +1535,7 @@ void HelloTriangleApplication::transitionImageLayout(VkImage       image,
     barrier.subresourceRange.layerCount = 1;
     barrier.srcAccessMask = 0; // TODO
     barrier.dstAccessMask = 0; // TODO
+    
     VkPipelineStageFlags sourceStage;
     VkPipelineStageFlags destinationStage;
 
